@@ -4,10 +4,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { cookies } from 'next/headers'
-import { getProfile } from '../../actions/profile'
+import { getProfile, calculateScore } from '../../actions/profile'
 import Link from 'next/link'
 import ReplyCard from './reply-card'
-import { supabase } from '@/lib/supabase'
 
 export default async function ReviewsPage({
   searchParams,
@@ -18,6 +17,7 @@ export default async function ReviewsPage({
   const session = cookieStore.get('sb-session')?.value || ''
 
   const profile = await getProfile(session)
+  const scoreData = await calculateScore(session)
 
   // Parse replies from URL params
   let replies: { label: string; text: string }[] = []
@@ -30,7 +30,7 @@ export default async function ReviewsPage({
   }
 
   return (
-    <DashboardLayout>
+    <DashboardLayout scoreData={scoreData}>
       <div className="space-y-6">
         <div className="p-6 rounded-xl border border-slate-800 bg-slate-950/50 backdrop-blur-sm">
           <h1 className="text-3xl font-bold text-white mb-2">Review Replies</h1>

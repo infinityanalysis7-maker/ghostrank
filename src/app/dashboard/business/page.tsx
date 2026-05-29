@@ -4,8 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { cookies } from 'next/headers'
-import { saveProfile, getProfile } from '../../actions/profile'
-import { supabase } from '@/lib/supabase'
+import { saveProfile, getProfile, calculateScore } from '../../actions/profile'
 
 const categories = [
   'Restaurant',
@@ -30,9 +29,10 @@ export default async function BusinessPage({
   const session = cookieStore.get('sb-session')?.value || ''
 
   const profile = await getProfile(session)
+  const scoreData = await calculateScore(session)
 
   return (
-    <DashboardLayout>
+    <DashboardLayout scoreData={scoreData}>
       <div className="space-y-6">
         <div className="p-6 rounded-xl border border-slate-800 bg-slate-950/50 backdrop-blur-sm">
           <h1 className="text-3xl font-bold text-white mb-2">My Business</h1>

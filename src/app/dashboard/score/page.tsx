@@ -3,7 +3,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
 import { cookies } from 'next/headers'
 import { calculateScore } from '../../actions/profile'
-import { supabase } from '@/lib/supabase'
 
 export default async function ScorePage() {
   const cookieStore = await cookies()
@@ -48,7 +47,7 @@ export default async function ScorePage() {
   const message = getMessage(score)
 
   return (
-    <DashboardLayout>
+    <DashboardLayout scoreData={scoreData}>
       <div className="space-y-6">
         <div className="p-6 rounded-xl border border-slate-800 bg-slate-950/50 backdrop-blur-sm">
           <h1 className="text-3xl font-bold text-white mb-2">Ghost Score</h1>

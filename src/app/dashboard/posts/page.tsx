@@ -3,10 +3,9 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { cookies } from 'next/headers'
 import { generatePosts, getPosts } from '../../actions/posts'
-import { getProfile } from '../../actions/profile'
+import { getProfile, calculateScore } from '../../actions/profile'
 import Link from 'next/link'
 import PostCard from './post-card'
-import { supabase } from '@/lib/supabase'
 
 export default async function PostsPage({
   searchParams,
@@ -18,9 +17,10 @@ export default async function PostsPage({
 
   const profile = await getProfile(session)
   const posts = await getPosts(session)
+  const scoreData = await calculateScore(session)
 
   return (
-    <DashboardLayout>
+    <DashboardLayout scoreData={scoreData}>
       <div className="space-y-6">
         <div className="p-6 rounded-xl border border-slate-800 bg-slate-950/50 backdrop-blur-sm">
           <h1 className="text-3xl font-bold text-white mb-2">Post Generator</h1>
@@ -72,10 +72,16 @@ export default async function PostsPage({
 
             {posts && posts.length > 0 && (
               <div>
-                <h2 className="text-xl font-bold text-white mb-4">Your Posts</h2>
+                <h2 className="text-xl font-bold text-white mb-4">Your Generated Posts</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {posts.map((post) => (
-                    <PostCard key={post.id} post={post} />
+                    <div key={post.id} className="border border-slate-800 bg-slate-950/50 backdrop-blur-sm rounded-lg p-4">
+                      <p className="text-sm text-slate-400 mb-2">
+                        {new Date(post.created_at).toLocaleDateString()}
+                      </p>
+                      <p className="text-white text-sm mb-3 line-clamp-3">{post.content}</p>
+                      <PostCard post={post} />
+                    </div>
                   ))}
                 </div>
               </div>

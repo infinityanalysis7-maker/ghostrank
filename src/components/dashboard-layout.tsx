@@ -15,7 +15,7 @@ const navItems = [
   { href: '/dashboard/score', label: 'Ghost Score', icon: TrendingUp },
 ]
 
-export function DashboardLayout({ children }: { children: React.ReactNode }) {
+export function DashboardLayout({ children, scoreData }: { children: React.ReactNode, scoreData?: { totalScore?: number, postCount?: number, replyCount?: number } | null }) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const pathname = usePathname()
 
@@ -101,7 +101,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm font-medium text-slate-400">Ghost Score</p>
-                    <p className="text-4xl font-bold text-white mt-2">--</p>
+                    <p className="text-4xl font-bold text-white mt-2">{scoreData?.totalScore ?? '--'}</p>
                   </div>
                   <TrendingUp className="h-10 w-10 text-blue-400" />
                 </div>
@@ -113,7 +113,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm font-medium text-slate-400">Posts Generated</p>
-                    <p className="text-4xl font-bold text-white mt-2">--</p>
+                    <p className="text-4xl font-bold text-white mt-2">{scoreData?.postCount ?? '--'}</p>
                   </div>
                   <FileText className="h-10 w-10 text-purple-400" />
                 </div>
@@ -125,7 +125,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm font-medium text-slate-400">Reviews Fixed</p>
-                    <p className="text-4xl font-bold text-white mt-2">--</p>
+                    <p className="text-4xl font-bold text-white mt-2">{scoreData?.replyCount ?? '--'}</p>
                   </div>
                   <MessageSquare className="h-10 w-10 text-green-400" />
                 </div>

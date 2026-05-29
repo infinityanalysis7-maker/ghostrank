@@ -67,7 +67,7 @@ export async function saveProfile(formData: FormData) {
     redirect('/dashboard/business?error=' + encodeURIComponent(error.message))
   }
 
-  redirect('/dashboard/business?success=' + encodeURIComponent('Profile saved successfully'))
+  redirect('/dashboard/business?success=' + encodeURIComponent('Profile saved! Your Ghost Score has been updated.'))
 }
 
 export async function getProfile(session: string) {
@@ -108,19 +108,54 @@ export async function calculateScore(session: string) {
     profileScore = (filledFields / fields.length) * 25
   }
 
-  // Count posts (25 points max - assume 10+ posts = full points)
+  // Count posts (25 points max: 0 posts = 0, 1-2 posts = 10, 3+ posts = 25)
   const { count: postCount } = await supabase
     .from('posts')
     .select('*', { count: 'exact', head: true })
     .eq('user_id', user.id)
 
-  const postScore = Math.min((postCount || 0) / 10 * 25, 25)
+  let postScore = 0
+  const actualPostCount = postCount || 0
+  if (actualPostCount === 0) {
+    postScore = 0
+  } else if (actualPostCount >= 1 && actualPostCount <= 2) {
+    postScore = 10
+  } else {
+    postScore = 25
+  }
 
-  // Review response rate (25 points max - placeholder for now)
-  const reviewScore = 0 // Will be calculated from reviews table later
+  // Review response rate (25 points max: 0 replies = 0, 1-2 replies = 10, 3+ replies = 25)
+  // For now, we'll track replies in the posts table as a simple counter
+  // In a real implementation, you'd have a separate replies table
+  const { data: postsWithReplies } = await supabase
+    .from('posts')
+    .select('has_replies')
+    .eq('user_id', user.id)
 
-  // Keyword power (25 points max - placeholder for now)
-  const keywordScore = 0 // Will be calculated from keywords table later
+  const replyCount = postsWithReplies?.filter(p => p.has_replies)?.length || 0
+
+  let reviewScore = 0
+  if (replyCount === 0) {
+    reviewScore = 0
+  } else if (replyCount >= 1 && replyCount <= 2) {
+    reviewScore = 10
+  } else {
+    reviewScore = 25
+  }
+
+  // Keyword power (25 points max: all 3 fields filled = 25, 2 filled = 15, 1 filled = 5)
+  let keywordScore = 0
+  if (profile) {
+    const keywordFields = ['business_name', 'category', 'city']
+    const filledKeywordFields = keywordFields.filter(field => profile[field]).length
+    if (filledKeywordFields === 3) {
+      keywordScore = 25
+    } else if (filledKeywordFields === 2) {
+      keywordScore = 15
+    } else if (filledKeywordFields === 1) {
+      keywordScore = 5
+    }
+  }
 
   const totalScore = Math.round(profileScore + postScore + reviewScore + keywordScore)
 
@@ -130,5 +165,7 @@ export async function calculateScore(session: string) {
     postScore: Math.round(postScore),
     reviewScore: Math.round(reviewScore),
     keywordScore: Math.round(keywordScore),
+    postCount: actualPostCount,
+    replyCount,
   }
 }

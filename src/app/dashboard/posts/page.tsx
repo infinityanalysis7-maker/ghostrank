@@ -6,6 +6,7 @@ import { generatePosts, getPosts } from '../../actions/posts'
 import { getProfile } from '../../actions/profile'
 import Link from 'next/link'
 import PostCard from './post-card'
+import { supabase } from '@/lib/supabase'
 
 export default async function PostsPage({
   searchParams,
@@ -13,13 +14,22 @@ export default async function PostsPage({
   searchParams: { error?: string; success?: string }
 }) {
   const cookieStore = await cookies()
-  const session = cookieStore.get('sb-session')?.value || 'user@example.com'
+  const session = cookieStore.get('sb-session')?.value || ''
+
+  // Get user email from Supabase auth instead of raw session token
+  let userEmail = 'Welcome back'
+  if (session) {
+    const { data: { user } } = await supabase.auth.getUser(session)
+    if (user?.email) {
+      userEmail = user.email
+    }
+  }
 
   const profile = await getProfile(session)
   const posts = await getPosts(session)
 
   return (
-    <DashboardLayout userEmail={session}>
+    <DashboardLayout userEmail={userEmail}>
       <div className="space-y-6">
         <div className="p-6 rounded-xl border border-slate-800 bg-slate-950/50 backdrop-blur-sm">
           <h1 className="text-3xl font-bold text-white mb-2">Post Generator</h1>

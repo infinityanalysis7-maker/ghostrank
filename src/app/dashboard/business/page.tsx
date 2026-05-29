@@ -29,19 +29,10 @@ export default async function BusinessPage({
   const cookieStore = await cookies()
   const session = cookieStore.get('sb-session')?.value || ''
 
-  // Get user email from Supabase auth instead of raw session token
-  let userEmail = 'Welcome back'
-  if (session) {
-    const { data: { user } } = await supabase.auth.getUser(session)
-    if (user?.email) {
-      userEmail = user.email
-    }
-  }
-
   const profile = await getProfile(session)
 
   return (
-    <DashboardLayout userEmail={userEmail}>
+    <DashboardLayout>
       <div className="space-y-6">
         <div className="p-6 rounded-xl border border-slate-800 bg-slate-950/50 backdrop-blur-sm">
           <h1 className="text-3xl font-bold text-white mb-2">My Business</h1>

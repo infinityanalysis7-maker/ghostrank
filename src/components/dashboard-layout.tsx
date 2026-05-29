@@ -15,12 +15,9 @@ const navItems = [
   { href: '/dashboard/score', label: 'Ghost Score', icon: TrendingUp },
 ]
 
-export function DashboardLayout({ children, userEmail }: { children: React.ReactNode, userEmail: string }) {
+export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const pathname = usePathname()
-
-  // Sanitize email - if it looks like a token, just show "Welcome back"
-  const displayEmail = userEmail.includes('@') ? userEmail : 'Welcome back'
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
@@ -73,7 +70,7 @@ export function DashboardLayout({ children, userEmail }: { children: React.React
           </nav>
 
           <div className="pt-6 border-t border-slate-800/50">
-            <p className="text-xs text-slate-500 truncate">{displayEmail}</p>
+            <p className="text-xs text-slate-500">GhostRank</p>
           </div>
         </div>
       </aside>
@@ -86,7 +83,6 @@ export function DashboardLayout({ children, userEmail }: { children: React.React
             <div className="flex items-center justify-between">
               <div>
                 <h2 className="text-3xl font-bold text-white">Welcome back</h2>
-                <p className="text-slate-400 mt-1">{displayEmail}</p>
               </div>
               <div className="hidden md:block">
                 <Link href="/dashboard/score">
